@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Magic Mushroom Map</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    #info { position:absolute; top:10px; left:10px; background:white; padding:10px; border-radius:4px; font-family:system-ui; max-width:300px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+    .legend { margin-top:8px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info">
+    <strong>Liberty Cap Prediction (UK+Ireland)</strong>
+    <div class="legend">Red = higher likelihood • Blue = lower</div>
+  </div>
+  <script>
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [-3, 54.5],
+      zoom: 5
+    });
+    
+    map.on('load', () => {
+      map.addSource('predictions', {
+        type: 'geojson',
+        data: './predictions.geojson'
+      });
+      map.addLayer({
+        id: 'predictions-circles',
+        type: 'circle',
+        source: 'predictions',
+        paint: {
+          'circle-radius': 6,
+          'circle-color': [
+            'interpolate',
+            ['linear'],
+            ['get', 'score'],
+            0, '#0066ff',
+            0.5, '#ffff00',
+            1, '#ff3300'
+          ],
+          'circle-opacity': 0.6,
+          'circle-stroke-width': 1,
+          'circle-stroke-color': '#333'
+        }
+      });
+    });
+  </script>
+</body>
+</html>
