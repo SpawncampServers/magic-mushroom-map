@@ -16,7 +16,7 @@
   <div id="map"></div>
   <div id="info">
     <strong>Liberty Cap Prediction (UK+Ireland)</strong>
-    <div>True continuous surface (no dots).</div>
+    <div>Continuous surface</div>
   </div>
   <script>
     const map = new maplibregl.Map({
@@ -30,10 +30,10 @@
         type: 'image',
         url: './pred.png',
         coordinates: [
-          [-8.1, 59.4],
-          [2.3, 59.4],
-          [2.3, 49.9],
-          [-8.1, 49.9]
+          [-8.05, 59.35],
+          [2.25, 59.35],
+          [2.25, 49.95],
+          [-8.05, 49.95]
         ]
       });
       map.addLayer({
