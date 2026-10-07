@@ -9,15 +9,14 @@
   <style>
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
-    #info { position:absolute; top:10px; left:10px; background:white; padding:10px; border-radius:4px; font-family:system-ui; max-width:340px; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:1; }
-    .legend { margin-top:8px; font-size:12px; }
+    #info { position:absolute; top:10px; left:10px; background:white; padding:10px; border-radius:4px; font-family:system-ui; max-width:320px; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:1; }
   </style>
 </head>
 <body>
   <div id="map"></div>
   <div id="info">
     <strong>Liberty Cap Prediction (UK+Ireland)</strong>
-    <div class="legend">Continuous-style: blurred grid avoids harsh dots. Use for cleaner look.</div>
+    <div>True continuous surface (no dots).</div>
   </div>
   <script>
     const map = new maplibregl.Map({
@@ -27,27 +26,22 @@
       zoom: 5
     });
     map.on('load', () => {
-      map.addSource('pred', {
-        type: 'geojson',
-        data: './predictions.geojson'
+      map.addSource('overlay', {
+        type: 'image',
+        url: './pred.png',
+        coordinates: [
+          [-8.0, 59.3],
+          [2.2, 59.3],
+          [2.2, 50.0],
+          [-8.0, 50.0]
+        ]
       });
       map.addLayer({
-        id: 'heat',
-        type: 'heatmap',
-        source: 'pred',
-        maxzoom: 15,
+        id: 'overlay',
+        type: 'raster',
+        source: 'overlay',
         paint: {
-          'heatmap-weight': ['interpolate', ['linear'], ['get','score'], 0, 0, 1, 1],
-          'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 5, 0.8, 8, 1.2],
-          'heatmap-color': [
-            'interpolate', ['linear'], ['heatmap-density'],
-            0, 'rgba(0,102,255,0)',
-            0.3, 'rgba(0,102,255,0.5)',
-            0.6, 'rgba(255,255,0,0.6)',
-            0.9, 'rgba(255,51,0,0.8)'
-          ],
-          'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 5, 15, 8, 25],
-          'heatmap-opacity': 0.7
+          'raster-opacity': 0.6
         }
       });
     });
