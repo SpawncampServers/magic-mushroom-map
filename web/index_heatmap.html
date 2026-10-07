@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Magic Mushroom Map</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    #info { position:absolute; top:10px; left:10px; background:white; padding:10px; border-radius:4px; font-family:system-ui; max-width:320px; box-shadow:0 2px 4px rgba(0,0,0,0.2); }
+    .legend { margin-top:8px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info">
+    <strong>Liberty Cap Prediction (UK+Ireland)</strong>
+    <div class="legend">Heatmap: blue → yellow → red (higher likelihood). Oceans masked.</div>
+  </div>
+  <script>
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [-3, 54.5],
+      zoom: 5
+    });
+    map.on('load', () => {
+      map.addLayer({
+        id: 'osm',
+        type: 'raster',
+        source: {
+          type: 'raster',
+          tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+          tileSize: 256
+        },
+        paint: { 'raster-opacity': 0.4 }
+      }, 'waterway');
+    });
+  </script>
+</body>
+</html>

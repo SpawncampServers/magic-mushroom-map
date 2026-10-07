@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Magic Mushroom Map</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+    #info { position:absolute; top:10px; left:10px; background:white; padding:10px; border-radius:4px; font-family:system-ui; max-width:320px; box-shadow:0 2px 4px rgba(0,0,0,0.2); z-index:1; }
+    .legend { margin-top:8px; font-size:12px; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <div id="info">
+    <strong>Liberty Cap Prediction (UK+Ireland)</strong>
+    <div class="legend">Smooth heatmap (blue→yellow→red). Grid replaced with interpolated surface.</div>
+  </div>
+  <script>
+    const map = new maplibregl.Map({
+      container: 'map',
+      style: 'https://demotiles.maplibre.org/style.json',
+      center: [-3, 54.5],
+      zoom: 5
+    });
+    map.on('load', () => {
+      // Add OSM for context
+      map.addSource('osm', {
+        type: 'raster',
+        tiles: ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+        tileSize: 256
+      });
+      map.addLayer({
+        id: 'osm',
+        type: 'raster',
+        source: 'osm',
+        paint: {'raster-opacity': 0.5}
+      });
+      // Simple colored raster representation via geojson not ideal; use image - but easier: use circle layer with smaller, blurred? Or better use deck.gl? Skip heavy deps
+      // Use raster tiles not yet; fallback to smooth circles
+      map.addSource('pred', {
+        type: 'geojson',
+        data: './predictions.geojson'
+      });
+      map.addLayer({
+        id: 'pred-blur',
+        type: 'circle',
+        source: 'pred',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 8, 8, 12],
+          'circle-color': [
+            'interpolate', ['linear'], ['get','score'],
+            0, 'rgba(0,102,255,0.2)',
+            0.5, 'rgba(255,255,0,0.25)',
+            1, 'rgba(255,51,0,0.3)'
+          ],
+          'circle-blur': 1.5
+        }
+      });
+      map.addLayer({
+        id: 'pred-core',
+        type: 'circle',
+        source: 'pred',
+        paint: {
+          'circle-radius': ['interpolate', ['linear'], ['zoom'], 5, 3, 8, 5],
+          'circle-color': [
+            'interpolate', ['linear'], ['get','score'],
+            0, '#06f',
+            0.5, '#ff0',
+            1, '#f30'
+          ],
+          'circle-opacity': 0.4
+        }
+      });
+    });
+  </script>
+</body>
+</html>
